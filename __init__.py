@@ -92,17 +92,27 @@ class library:
 		#endregion
 		self.CDLL = cd
 
+	#region classes
 	class SM64Surface(_SM64Surface): pass
 	class SM64MarioInputs(_SM64MarioInputs): pass
 	class SM64ObjectTransform(_SM64ObjectTransform): pass
 	class SM64SurfaceObject(_SM64SurfaceObject): pass
 	class SM64MarioState(_SM64MarioState): pass
 	class SM64MarioGeometryBuffers(_SM64MarioGeometryBuffers):pass
+	#endregion
+	#region enums
 	SM64DebugPrintFunctionPtr=_SM64DebugPrintFunctionPtr
 	SM64_TEXTURE_WIDTH = _SM64_TEXTURE_WIDTH
 	SM64_TEXTURE_HEIGHT = _SM64_TEXTURE_HEIGHT
 	SM64_GEO_MAX_TRIANGLES = _SM64_GEO_MAX_TRIANGLES
+	#endregion
+	#region python definitions
 	def sm64_global_init( self, rom:c_char_p, texture_bytes:c_char_p, debugPrintFunction: _SM64DebugPrintFunctionPtr|None = None ):
 		self.CDLL.sm64_global_init(rom,texture_bytes,debugPrintFunction)
+	def sm64_global_terminate( self ):
+		self.CDLL.sm64_global_terminate()
+	def sm64_static_surfaces_load( self, surfaceArray:list[_SM64Surface], numSurface:c_uint32 ):
+		self.CDLL.sm64_static_surfaces_load()
+	#endregion
 
 #endregion
