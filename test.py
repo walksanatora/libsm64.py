@@ -1,6 +1,6 @@
 import __init__ as libsm64
 import ctypes as c
-l = libsm64.library('./libsm64/dist/libsm64.so')
+l = libsm64.library()
 
 def debug_print(string):
 	print(string)

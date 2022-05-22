@@ -62,34 +62,33 @@ class library:
 		#region cdll io setup
 		
 		#lifecycle
-		sharedLibrary.sm64_global_init.argtypes = ( c_char_p,c_char_p,_SM64DebugPrintFunctionPtr )
+		sharedLibrary.sm64_global_init.argtypes = [ c_char_p, c_char_p, _SM64DebugPrintFunctionPtr ]
 		sharedLibrary.sm64_global_init.restype = ( None )
 		sharedLibrary.sm64_global_terminate.argtypes = ( None )
 		sharedLibrary.sm64_global_terminate.restype = ( None )
 
 		#objects
-		sharedLibrary.sm64_static_surfaces_load.argtypes = (POINTER(_SM64Surface),c_uint32)
+		sharedLibrary.sm64_static_surfaces_load.argtypes = [ POINTER(_SM64Surface),c_uint32 ]
 		sharedLibrary.sm64_static_surfaces_load.restype = ( None )
 
 		#mario
-		sharedLibrary.sm64_mario_create.argtypes = ( c_int16, c_int16, c_int16 )
+		sharedLibrary.sm64_mario_create.argtypes = [ c_int16, c_int16, c_int16 ]
 		sharedLibrary.sm64_mario_create.restype = ( c_int32 )
-		sharedLibrary.sm64_mario_tick.argtypes = ( c_int32, POINTER(_SM64MarioInputs), POINTER(_SM64MarioState), POINTER(_SM64MarioGeometryBuffers) )
+		sharedLibrary.sm64_mario_tick.argtypes = [ c_int32, POINTER(_SM64MarioInputs), POINTER(_SM64MarioState), POINTER(_SM64MarioGeometryBuffers) ]
 		sharedLibrary.sm64_mario_tick.restype = ( None )
-		sharedLibrary.sm64_mario_delete.argtypes = ( c_int32 )
+		sharedLibrary.sm64_mario_delete.argtypes = [ c_int32 ]
 		sharedLibrary.sm64_mario_delete.restype = ( None )
 
 		#surfaces
-		sharedLibrary.sm64_surface_object_create.argtypes = ( POINTER(_SM64SurfaceObject) )
-		sharedLibrary.sm64_surgace_object_create.restype = ( c_uint32 )
-		sharedLibrary.sm64_surface_object_move.argtypes = ( c_uint32, POINTER(_SM64ObjectTransform))
+		sharedLibrary.sm64_surface_object_create.argtypes = [ POINTER(_SM64SurfaceObject) ]
+		sharedLibrary.sm64_surface_object_create.restype = ( c_uint32 )
+		sharedLibrary.sm64_surface_object_move.argtypes = [ c_uint32, POINTER(_SM64ObjectTransform) ]
 		sharedLibrary.sm64_surface_object_move.restype = ( None )
-		sharedLibrary.sm64_surface_object_delete.argtypes = ( c_uint32 )
+		sharedLibrary.sm64_surface_object_delete.argtypes = [ c_uint32 ]
 		sharedLibrary.sm64_surface_object_delete.restype = ( None )
 
 		#endregion
 		self.CDLL = sharedLibrary
-
 	#region classes
 	class SM64Surface(_SM64Surface): pass
 	class SM64MarioInputs(_SM64MarioInputs): pass
