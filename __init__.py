@@ -1,6 +1,4 @@
 from ctypes import *
-import ctypes as ct
-from typing import Callable
 
 #region Structs
 class _SM64Surface(Structure):
@@ -60,37 +58,37 @@ _SM64_GEO_MAX_TRIANGLES = 1024
 #region library
 class library:
 	def __init__(self,libsm64_path:str = './libsm64.so'):
-		cd = CDLL(libsm64_path)
+		sharedLibrary = CDLL(libsm64_path)
 		#region cdll io setup
 		
 		#lifecycle
-		cd.sm64_global_init.argtypes = ( c_char_p,c_char_p,_SM64DebugPrintFunctionPtr )
-		cd.sm64_global_init.restype = ( None )
-		cd.sm64_global_terminate.argtypes = ( None )
-		cd.sm64_global_terminate.restype = ( None )
+		sharedLibrary.sm64_global_init.argtypes = ( c_char_p,c_char_p,_SM64DebugPrintFunctionPtr )
+		sharedLibrary.sm64_global_init.restype = ( None )
+		sharedLibrary.sm64_global_terminate.argtypes = ( None )
+		sharedLibrary.sm64_global_terminate.restype = ( None )
 
 		#objects
-		cd.sm64_static_surfaces_load.argtypes = (POINTER(_SM64Surface),c_uint32)
-		cd.sm64_static_surfaces_load.restype = ( None )
+		sharedLibrary.sm64_static_surfaces_load.argtypes = (POINTER(_SM64Surface),c_uint32)
+		sharedLibrary.sm64_static_surfaces_load.restype = ( None )
 
 		#mario
-		cd.sm64_mario_create.argtypes = ( c_int16, c_int16, c_int16 )
-		cd.sm64_mario_create.restype = ( c_int32 )
-		cd.sm64_mario_tick.argtypes = ( c_int32, POINTER(_SM64MarioInputs), POINTER(_SM64MarioState), POINTER(_SM64MarioGeometryBuffers) )
-		cd.sm64_mario_tick.restype = ( None )
-		cd.sm64_mario_delete.argtypes = ( c_int32 )
-		cd.sm64_mario_delete.restype = ( None )
+		sharedLibrary.sm64_mario_create.argtypes = ( c_int16, c_int16, c_int16 )
+		sharedLibrary.sm64_mario_create.restype = ( c_int32 )
+		sharedLibrary.sm64_mario_tick.argtypes = ( c_int32, POINTER(_SM64MarioInputs), POINTER(_SM64MarioState), POINTER(_SM64MarioGeometryBuffers) )
+		sharedLibrary.sm64_mario_tick.restype = ( None )
+		sharedLibrary.sm64_mario_delete.argtypes = ( c_int32 )
+		sharedLibrary.sm64_mario_delete.restype = ( None )
 
 		#surfaces
-		cd.sm64_surface_object_create.argtypes = ( POINTER(_SM64SurfaceObject) )
-		cd.sm64_surgace_object_create.restype = ( c_uint32 )
-		cd.sm64_surface_object_move.argtypes = ( c_uint32, POINTER(_SM64ObjectTransform))
-		cd.sm64_surface_object_move.restype = ( None )
-		cd.sm64_surface_object_delete.argtypes = ( c_uint32 )
-		cd.sm64_surface_object_delete.restype = ( None )
+		sharedLibrary.sm64_surface_object_create.argtypes = ( POINTER(_SM64SurfaceObject) )
+		sharedLibrary.sm64_surgace_object_create.restype = ( c_uint32 )
+		sharedLibrary.sm64_surface_object_move.argtypes = ( c_uint32, POINTER(_SM64ObjectTransform))
+		sharedLibrary.sm64_surface_object_move.restype = ( None )
+		sharedLibrary.sm64_surface_object_delete.argtypes = ( c_uint32 )
+		sharedLibrary.sm64_surface_object_delete.restype = ( None )
 
 		#endregion
-		self.CDLL = cd
+		self.CDLL = sharedLibrary
 
 	#region classes
 	class SM64Surface(_SM64Surface): pass
