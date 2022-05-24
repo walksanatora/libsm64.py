@@ -1,7 +1,5 @@
 from ctypes import *
 
-from construct import Pointer
-
 #region Structs
 class _SM64Surface(Structure):
 		_fields_ = (
@@ -43,7 +41,7 @@ class _SM64MarioGeometryBuffers(Structure):
     	('numTrianglesUsed',c_uint16)
 	)
 #endregion
-#region typedefspointer
+#region typedefs pointer
 _SM64DebugPrintFunctionPtr = CFUNCTYPE(None,c_char_p)
 _SM64DebugPrintFunctionPtr.old_param = _SM64DebugPrintFunctionPtr.from_param
 def from_param(cls, obj):
@@ -79,6 +77,27 @@ class sm64_surface:
 			return param
 		else: return self.__dict__[name]
 
+class sm64_mario_inputs():
+	def __init__( self,axisX:float=0,axisY:float=0,camX:float=0,camY:float=0,A:bool=False,B:bool=True,Z:bool=True):
+		self.axisX=axisX
+		self.axisY=axisY
+		self.camX=camX
+		self.camY=camY
+		self.A=A
+		self.B=B
+		self.Z=Z
+	def __getattr__(self,name:str):
+		if name == '_as_parameter_':
+			param = _SM64MarioInputs()
+			param.camLookX=self.camX
+			param.camLookZ=self.camY
+			param.stickX=self.axisX
+			param.stickY=self.axisY
+			param.buttonA=c_int8(self.A)
+			param.buttonB=c_int8(self.B)
+			param.buttonZ=c_int8(self.Z)
+			return param
+		else: return self.__dict__[name]
 
 class library:
 	def __init__(self,libsm64_path:str = './libsm64.so'):
@@ -140,12 +159,23 @@ class library:
 		for surface in surfaceArray:
 			surfaceArrayTMP[cout] = surface._as_parameter_
 			cout += 1
-		surfaceArrayPointer = byref(surfaceArrayTMP)
+		surfaceArrayPointer = surfaceArrayTMP
 		self.CDLL.sm64_static_surfaces_load(surfaceArrayPointer,c_uint32(len(surfaceArray)))
 	def sm64_mario_create( self, x:int, y:int, z:int)->int:
-		return int(self.CDLL.sm64_mario_create(c_int16(x),c_int16(y),c_int16(z)))
+		return self.CDLL.sm64_mario_create(x,y,z)
+	def sm64_mario_tick(self,mario_id:int,inputs:sm64_mario_inputs,state:_SM64MarioState,geobuf:_SM64MarioGeometryBuffers):
+		self.CDLL.sm64_mario_tick(mario_id,inputs,byref(state),byref(geobuf))
 
 
 	#endregion
+	class util:
+		def generateBlankMarioGeoBuffers()->_SM64MarioGeometryBuffers:
+			geobuf = _SM64MarioGeometryBuffers()
+			geobuf.position = (POINTER(c_float*(9*_SM64_GEO_MAX_TRIANGLES)))()
+			geobuf.color = (c_float * 9 * _SM64_GEO_MAX_TRIANGLES)()
+			geobuf.normal = (c_float * 9 * _SM64_GEO_MAX_TRIANGLES)()
+			geobuf.uv = (c_float * 6 * _SM64_GEO_MAX_TRIANGLES)()
+			return geobuf
+
 
 #endregion
