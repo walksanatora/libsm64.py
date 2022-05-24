@@ -93,9 +93,9 @@ class sm64_mario_inputs():
 			param.camLookZ=self.camY
 			param.stickX=self.axisX
 			param.stickY=self.axisY
-			param.buttonA=c_int8(self.A)
-			param.buttonB=c_int8(self.B)
-			param.buttonZ=c_int8(self.Z)
+			param.buttonA=c_uint8(self.A)
+			param.buttonB=c_uint8(self.B)
+			param.buttonZ=c_uint8(self.Z)
 			return param
 		else: return self.__dict__[name]
 
@@ -164,17 +164,17 @@ class library:
 	def sm64_mario_create( self, x:int, y:int, z:int)->int:
 		return self.CDLL.sm64_mario_create(x,y,z)
 	def sm64_mario_tick(self,mario_id:int,inputs:sm64_mario_inputs,state:_SM64MarioState,geobuf:_SM64MarioGeometryBuffers):
-		self.CDLL.sm64_mario_tick(mario_id,inputs,byref(state),byref(geobuf))
+		self.CDLL.sm64_mario_tick(mario_id,byref(inputs._as_parameter_),byref(state),byref(geobuf))
 
 
 	#endregion
 	class util:
 		def generateBlankMarioGeoBuffers()->_SM64MarioGeometryBuffers:
 			geobuf = _SM64MarioGeometryBuffers()
-			geobuf.position = (POINTER(c_float*(9*_SM64_GEO_MAX_TRIANGLES)))()
-			geobuf.color = (c_float * 9 * _SM64_GEO_MAX_TRIANGLES)()
-			geobuf.normal = (c_float * 9 * _SM64_GEO_MAX_TRIANGLES)()
-			geobuf.uv = (c_float * 6 * _SM64_GEO_MAX_TRIANGLES)()
+			geobuf.position = (c_float*(9*_SM64_GEO_MAX_TRIANGLES))()
+			geobuf.color = (c_float * (9 * _SM64_GEO_MAX_TRIANGLES))()
+			geobuf.normal = (c_float * (9 * _SM64_GEO_MAX_TRIANGLES))()
+			geobuf.uv = (c_float * (6 * _SM64_GEO_MAX_TRIANGLES))()
 			return geobuf
 
 
