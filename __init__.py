@@ -56,6 +56,35 @@ _SM64_TEXTURE_HEIGHT = 64
 _SM64_GEO_MAX_TRIANGLES = 1024
 #endregion
 #region library
+
+class sm64_surface:
+	def __init__( self, type=0,force=0,terrain=0,vertices=[[10,0,0],[10,0,0],[0,0,10]]):
+		self.type = type
+		self.force = force
+		self.terrain = terrain
+		self.vertices = vertices
+		self._as_parameter_ = _SM64Surface()
+		self._as_parameter_.force = force
+		self._as_parameter_.type = type
+		self._as_parameter_.terrain = terrain
+		vertArray = (c_int16*3*3)()
+		for i in range(3):
+			vertArray[i][:] = vertices[i]
+		self._as_parameter_.vertices = vertArray
+	def __set_attribute__(self, __name: str, __value: any) -> None:
+		setattr(self,__name,__value)
+		del self._as_parameter_
+		self._as_parameter_ = _SM64Surface()
+		self._as_parameter_.force = self.force
+		self._as_parameter_.type = self.type
+		self._as_parameter_.terrain = self.terrain
+		vertArray = (c_int16*3*3)()
+		for i in range(3):
+			vertArray[i][:] = self.vertices[i]
+		self._as_parameter_.vertices = vertArray
+
+
+
 class library:
 	def __init__(self,libsm64_path:str = './libsm64.so'):
 		sharedLibrary = CDLL(libsm64_path)
@@ -104,12 +133,19 @@ class library:
 	SM64_GEO_MAX_TRIANGLES = _SM64_GEO_MAX_TRIANGLES
 	#endregion
 	#region python definitions
-	def sm64_global_init( self, rom:c_char_p, texture_bytes:c_char_p, debugPrintFunction: _SM64DebugPrintFunctionPtr|None = None ):
-		self.CDLL.sm64_global_init(rom,texture_bytes,debugPrintFunction)
+	def sm64_global_init( self, rom:bytes, texture_bytes:bytes, debugPrintFunction: _SM64DebugPrintFunctionPtr|None = None ):
+		tbc = c_char_p(texture_bytes)
+		self.CDLL.sm64_global_init(c_char_p(rom),texture_bytes,debugPrintFunction)
+		texture_bytes = tbc.value
 	def sm64_global_terminate( self ):
 		self.CDLL.sm64_global_terminate()
-	def sm64_static_surfaces_load( self, surfaceArray:list[_SM64Surface], numSurface:c_uint32 ):
-		self.CDLL.sm64_static_surfaces_load()
+	def sm64_static_surfaces_load( self, surfaceArray:list[sm64_surface] ):
+		surfaceArrayPointer = pointer(Array(*surfaceArray))
+		self.CDLL.sm64_static_surfaces_load(surfaceArrayPointer,c_uint32(len(surfaceArray)))
+	def sm64_mario_create( self, x:int, y:int, z:int)->int:
+		return int(self.CDLL.sm64_mario_create(c_int16(x),c_int16(y),c_int16(z)))
+
+
 	#endregion
 
 #endregion
