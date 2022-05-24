@@ -11,6 +11,14 @@ with open('baserom.us.z64','rb') as rom:
 	rom_data = rom.read()
 	l.sm64_global_init(rom_data,texture_bytes,dp)
 	del rom_data
-	surface = libsm64.sm64_surface()
-	surface.vertices[0][1] = 12
-	print(surface._as_parameter_)
+	surface = libsm64.sm64_surface(vertices=[
+		[10,0,10],
+		[-10,0,-10],
+		[-10,0,0]
+	])
+	surfaceII=libsm64.sm64_surface(vertices=[
+		[10,0,10],
+		[-10,0,-10],
+		[0,0,10]
+	])
+	l.sm64_static_surfaces_load([surface,surfaceII])

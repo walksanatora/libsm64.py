@@ -1,5 +1,7 @@
 from ctypes import *
 
+from construct import Pointer
+
 #region Structs
 class _SM64Surface(Structure):
 		_fields_ = (
@@ -55,7 +57,7 @@ _SM64_TEXTURE_WIDTH = 704
 _SM64_TEXTURE_HEIGHT = 64
 _SM64_GEO_MAX_TRIANGLES = 1024
 #endregion
-#region library
+#region library/python classes
 
 class sm64_surface:
 	def __init__( self, type=0,force=0,terrain=0,vertices=[[10,0,0],[10,0,0],[0,0,10]]):
@@ -63,26 +65,19 @@ class sm64_surface:
 		self.force = force
 		self.terrain = terrain
 		self.vertices = vertices
-		self._as_parameter_ = _SM64Surface()
-		self._as_parameter_.force = force
-		self._as_parameter_.type = type
-		self._as_parameter_.terrain = terrain
-		vertArray = (c_int16*3*3)()
-		for i in range(3):
-			vertArray[i][:] = vertices[i]
-		self._as_parameter_.vertices = vertArray
-	def __set_attribute__(self, __name: str, __value: any) -> None:
-		setattr(self,__name,__value)
-		del self._as_parameter_
-		self._as_parameter_ = _SM64Surface()
-		self._as_parameter_.force = self.force
-		self._as_parameter_.type = self.type
-		self._as_parameter_.terrain = self.terrain
-		vertArray = (c_int16*3*3)()
-		for i in range(3):
-			vertArray[i][:] = self.vertices[i]
-		self._as_parameter_.vertices = vertArray
-
+	def __getattr__(self,name:str):
+		if name == '_as_parameter_':
+			param = _SM64Surface()
+			param.type = self.type
+			param.force = self.force
+			param.terrain = self.terrain
+			param.vertices = (c_int16*3*3)()
+			sv = self.vertices
+			for i in range(3):
+				param.vertices[i][:] =sv[i]
+			del sv
+			return param
+		else: return self.__dict__[name]
 
 
 class library:
@@ -140,7 +135,12 @@ class library:
 	def sm64_global_terminate( self ):
 		self.CDLL.sm64_global_terminate()
 	def sm64_static_surfaces_load( self, surfaceArray:list[sm64_surface] ):
-		surfaceArrayPointer = pointer(Array(*surfaceArray))
+		surfaceArrayTMP = (_SM64Surface * len(surfaceArray))()
+		cout = 0
+		for surface in surfaceArray:
+			surfaceArrayTMP[cout] = surface._as_parameter_
+			cout += 1
+		surfaceArrayPointer = byref(surfaceArrayTMP)
 		self.CDLL.sm64_static_surfaces_load(surfaceArrayPointer,c_uint32(len(surfaceArray)))
 	def sm64_mario_create( self, x:int, y:int, z:int)->int:
 		return int(self.CDLL.sm64_mario_create(c_int16(x),c_int16(y),c_int16(z)))
